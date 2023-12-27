@@ -1,0 +1,98 @@
+name: CD
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      version-major:
+        description: The base image major version
+        required: true
+        type: string
+      version-minor:
+        description: The base image minor version
+        required: true
+        type: string
+      tag-latest:
+        description: Set 'true' to tag the image with 'lastest'
+        required: true
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.version-major }}.${{ inputs.version-minor }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY_IMAGE_HAPROXY_ACME: flobernd/haproxy-acme
+  REGISTRY_IMAGE_HAPROXY_ACME_HTTP01: flobernd/haproxy-acme-http01
+
+jobs:
+  meta:
+    name: Extract Metadata
+    runs-on: ubuntu-latest
+
+    outputs:
+      labels: ${{ steps.meta.outputs.labels }}
+      annotations: ${{ steps.meta.outputs.annotations }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          labels: |
+            org.opencontainers.image.version=${{ inputs.version-major }}.${{ inputs.version-minor }}
+          annotations: |
+            org.opencontainers.image.version=${{ inputs.version-major }}.${{ inputs.version-minor }}
+
+  main1:
+    name: CD
+    needs:
+      - meta
+    uses:
+      ./.github/workflows/docker_release.yml
+    with:
+      registry: ghcr.io
+      image: flobernd/haproxy-acme
+      context: ./haproxy-acme/data
+      build-args: |
+        BASE_IMAGE=haproxy:${{ inputs.version-major }}.${{ inputs.version-minor }}-bookworm
+      platforms: '["linux/386", "linux/amd64", "linux/arm/v5", "linux/arm/v7", "linux/arm64", "linux/mips64le", "linux/ppc64le", "linux/s390x"]'
+      tags: |
+        ghcr.io/flobernd/haproxy-acme:${{ inputs.version-major }}.${{ inputs.version-minor }}
+        ghcr.io/flobernd/haproxy-acme:${{ inputs.version-major }}
+        ${{ inputs.tag-latest && format('{0}:latest', 'ghcr.io/flobernd/haproxy-acme') || '' }}
+      labels: ${{ needs.meta.outputs.labels }}
+      annotations: ${{ needs.meta.outputs.annotations }}
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+  main2:
+    name: CD
+    needs:
+      - meta
+      - main1
+    uses:
+      ./.github/workflows/docker_release.yml
+    with:
+      registry: ghcr.io
+      image: flobernd/haproxy-acme-http01
+      context: ./haproxy-acme-http01/data
+      build-args: |
+        BASE_IMAGE=ghcr.io/flobernd/haproxy-acme:${{ inputs.version-major }}.${{ inputs.version-minor }}
+      platforms: '["linux/386", "linux/amd64", "linux/arm/v5", "linux/arm/v7", "linux/arm64", "linux/mips64le", "linux/ppc64le", "linux/s390x"]'
+      tags: |
+        ghcr.io/flobernd/haproxy-acme-http01:${{ inputs.version-major }}.${{ inputs.version-minor }}
+        ghcr.io/flobernd/haproxy-acme-http01:${{ inputs.version-major }}
+        ${{ inputs.tag-latest && format('{0}:latest', 'ghcr.io/flobernd/haproxy-acme-http01') || '' }}
+      labels: ${{ needs.meta.outputs.labels }}
+      annotations: ${{ needs.meta.outputs.annotations }}
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
