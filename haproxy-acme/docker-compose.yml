@@ -6,23 +6,8 @@ services:
     container_name: haproxy-acme
     restart: unless-stopped
     environment:
-      - "HAPROXY_HTTP_PORT=80"
-      - "HAPROXY_HTTPS_PORT=443"
+      - "ACME_DEBUG=0"
       - "ACME_UPGRADE=1"
-      - "ACME_MAIL=a@b.de"
-      - "ACME_SERVER=zerossl"
-      - "ACME_DOMAIN=test.flobernd.de"
-      - "ACME_KEYLENGTH=ec-256"
-      - "SERVER_ADDRESS=whoami"
-      - "SERVER_PORT=80"
-      - "SERVER_DIRECTIVES="
+      - "ACME_CRON=1"
     volumes:
       - ./volume/acme:/var/lib/acme:rw
-    ports:
-      - 80:80
-      - 443:443
-
-  whoami:
-    image: traefik/whoami
-    container_name: whoami
-    restart: unless-stopped

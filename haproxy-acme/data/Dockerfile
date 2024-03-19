@@ -4,6 +4,7 @@ FROM $BASE_IMAGE
 
 # Environment
 
+ENV ACME_DEBUG=0
 ENV ACME_UPDATE=0
 ENV ACME_CRON=1
 
@@ -74,9 +75,15 @@ RUN apt-get install -y --no-install-recommends \
         supervisor \
         ca-certificates \
         curl \
-        socat
+        socat \
+        idn
 
 COPY --chown=haproxy:haproxy supervisord.conf /etc/supervisord.conf
+
+# Set up 'haproxy' config directories
+
+RUN mkdir -p /etc/haproxy && chown haproxy:haproxy /etc/haproxy && chmod 0700 /etc/haproxy
+RUN mkdir -p /usr/etc/haproxy/include && chown haproxy:haproxy /usr/etc/haproxy/include && chmod 0700 /usr/etc/haproxy/include
 
 # Copy scripts
 
@@ -89,6 +96,9 @@ COPY initialize.sh     /usr/local/bin/
 # Cleanup
 
 RUN rm -rf /var/lib/apt/lists/*
+
+# Smoke test
+RUN haproxy -v
 
 # Replace source image entrypoint and command
 

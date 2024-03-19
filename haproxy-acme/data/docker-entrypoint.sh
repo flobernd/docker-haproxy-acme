@@ -10,6 +10,16 @@ if [ "$1" = 'daemon' ]; then
     chown -R haproxy:haproxy /var/lib/acme
     chmod 0700 /var/lib/acme
 
+    # Adjust permissions for 'haproxy' directories
+    chown -R haproxy:haproxy /usr/local/etc/haproxy
+    chmod 0700 /usr/local/etc/haproxy
+    chmod 0600 /usr/local/etc/haproxy/* 2> /dev/null || true
+
+    mkdir -p /usr/local/etc/haproxy/include
+    chown -R haproxy:haproxy /usr/local/etc/haproxy/include
+    chmod 0700 /usr/local/etc/haproxy/include
+    chmod 0600 /usr/local/etc/haproxy/include/* 2> /dev/null || true
+
     # Source the 'acme.sh' alias
     source /usr/local/share/acme/acme.sh.env
 

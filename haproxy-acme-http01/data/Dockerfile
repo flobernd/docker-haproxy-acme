@@ -16,10 +16,13 @@ ENV SERVER_ADDRESS=
 ENV SERVER_PORT=80
 ENV SERVER_DIRECTIVES=
 
-# Configure 'haproxy'
+# Set up 'haproxy' certificate directory
 
-COPY --chown=haproxy:haproxy ./haproxy.cfg /usr/local/etc/haproxy
-RUN mkdir -p /etc/haproxy/certs && chown haproxy:haproxy /etc/haproxy/certs && chmod 0600 /etc/haproxy/certs
+RUN mkdir -p /etc/haproxy/certs && chown haproxy:haproxy /etc/haproxy/certs && chmod 0700 /etc/haproxy/certs
+
+# Copy 'haproxy' configuration template
+
+COPY --chown=haproxy:haproxy ./haproxy.cfg /etc/haproxy/haproxy.cfg.template
 
 # Copy scripts
 

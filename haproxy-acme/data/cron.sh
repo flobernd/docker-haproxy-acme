@@ -8,11 +8,19 @@ fi
 
 trap "exit 0" SIGTERM
 
+args=(
+    "--cron"
+)
+
+if [ $ACME_DEBUG -eq 1 ]; then
+    args+=("--debug")
+fi
+
 interval=86400 # 1 day
 while :
 do
     now=$(date +%s) # timestamp in seconds
     sleep $((interval - now % interval)) & wait $!
 
-    acme.sh --cron
+    acme.sh "${args[@]}"
 done

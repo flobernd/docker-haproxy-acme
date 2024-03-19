@@ -3,7 +3,17 @@ set -e
 
 echo "Registering ACME account for '$ACME_MAIL' on '$ACME_SERVER' ..."
 
-input=$(acme.sh --server "$ACME_SERVER" --register-account -m "$ACME_MAIL") || (echo "$input" && exit 1)
+args=(
+    "--server" "$ACME_SERVER"
+    "--register-account"
+    "-m" "$ACME_MAIL"
+)
+
+if [ $ACME_DEBUG -eq 1 ]; then
+    args+=("--debug")
+fi
+
+input=$(acme.sh "${args[@]}") || (echo "$input" && exit 1)
 
 pattern="^.*ACCOUNT_THUMBPRINT='([a-zA-Z0-9_-]+)'$"
 
@@ -16,7 +26,7 @@ if [[ $input =~ $pattern ]]; then
         echo "Account created"
     fi
 
-    echo "Using ACME account thumbprint:"
+    echo "ACME account thumbprint:"
     echo "$ACME_ACCOUNT_THUMBPRINT"
 else
     echo "Failed to extract ACME account thumbprint:"
