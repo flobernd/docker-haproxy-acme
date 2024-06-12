@@ -4,7 +4,7 @@ A Docker image that combines [haproxy](https://www.haproxy.org/) and [acme.sh](h
 
 ## Motivation
 
-The combination of `haproxy` and `acme.sh` provides a lightweight alternative to `Traefik` to implement SLL termination for public facing Docker services. A main advantage is the decentralized organization of certificates and the implementation of the Zero Trust principle within a container group.
+The combination of `haproxy` and `acme.sh` provides a lightweight alternative to `Traefik` to implement SSL (TLS) termination for public facing Docker services. A main advantage is the decentralized organization of certificates and the implementation of the Zero Trust principle within a container group.
 
 ---
 
