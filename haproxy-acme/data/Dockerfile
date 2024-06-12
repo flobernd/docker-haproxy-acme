@@ -45,8 +45,6 @@ RUN set -eux; \
     ln -s /usr/local/share/acme/acme.sh /usr/local/bin/ && \
     chmod 755 /usr/local/share/acme/; \
     \
-    curl https://raw.githubusercontent.com/haproxy/haproxy/master/admin/acme.sh/haproxy.sh | tee /usr/local/share/acme/deploy/haproxy.sh; \
-    \
     apt-mark auto '.*' > /dev/null; \
     [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
     find /usr/local -type f -executable -exec ldd '{}' ';' \
