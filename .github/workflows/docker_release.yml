@@ -108,7 +108,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload Digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: digests_${{ env.IMAGE_ID }}
           path: /tmp/digests/*
@@ -133,7 +133,7 @@ jobs:
           echo "IMAGE_ID=${IMAGE_ID////_}" >> $GITHUB_ENV
 
       - name: Download Digests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: digests_${{ env.IMAGE_ID }}
           path: /tmp/digests

@@ -26,7 +26,7 @@ The `haproxy-acme-http01` image is a ready-to-run image for local SSL terminatio
 ### Example
 
 ```bash
-docker run --name haproxy-acme-http01 \
+docker run -d --name haproxy-acme-http01 \
     -e "ACME_MAIL=mail@domain.com" \
     -e "ACME_DOMAIN=domain.com" \
     -e "SERVER_ADDRESS=whoami" \
@@ -175,7 +175,7 @@ The `haproxy-acme-dns01` image is a ready-to-run image for local SSL termination
 ### Example
 
 ```bash
-docker run --name haproxy-acme-dns01 \
+docker run -d --name haproxy-acme-dns01 \
     -e "ACME_MAIL=mail@domain.com" \
     -e "ACME_DOMAIN=domain.com *.domain.com" \
     -e "ACME_DNS_API=dns_cf" \
