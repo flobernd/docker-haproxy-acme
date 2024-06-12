@@ -41,8 +41,6 @@ docker run -d --name haproxy-acme-http01 \
 ### Docker Compose Example
 
 ```yaml
-version: '3.8'
-
 services:
   haproxy-acme:
     image: ghcr.io/flobernd/haproxy-acme-http01:latest
@@ -184,15 +182,12 @@ docker run -d --name haproxy-acme-dns01 \
     -v /docker_data/acme:/var/lib/acme:rw \
     -p 80:80 \
     -p 443:443 \
-    --sysctl net.ipv4.ip_unprivileged_port_start=0 \
     ghcr.io/flobernd/haproxy-acme-dns01
 ```
 
 ### Docker Compose Example
 
 ```yaml
-version: '3.8'
-
 services:
   haproxy-acme:
     image: ghcr.io/flobernd/haproxy-acme-dns01:latest
