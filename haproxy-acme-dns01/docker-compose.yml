@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   haproxy-acme:
     image: flobernd/haproxy-acme-dns01:latest
@@ -25,8 +23,8 @@ services:
     volumes:
       - ./volume/acme:/var/lib/acme:rw
     ports:
-      - 80:80
-      - 443:443
+      - 8080:80
+      - 8443:443
 
   whoami:
     image: traefik/whoami

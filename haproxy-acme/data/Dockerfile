@@ -5,7 +5,7 @@ FROM $BASE_IMAGE
 # Environment
 
 ENV ACME_DEBUG=0
-ENV ACME_UPDATE=0
+ENV ACME_UPGRADE=0
 ENV ACME_CRON=1
 
 # Reset user to root

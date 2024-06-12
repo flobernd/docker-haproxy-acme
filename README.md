@@ -103,7 +103,7 @@ frontend http
 
 Set to `1` in order to enable verbose `acme.sh` debug output.
 
-#### `ACME_UPDATE`
+#### `ACME_UPGRADE`
 
 Set to `1` in order to automatically update `acme.sh` to the latest version on container startup. This requires an active internet connection (default: `0`).
 
@@ -233,7 +233,7 @@ global
 
 Set to `1` in order to enable verbose `acme.sh` debug output.
 
-#### `ACME_UPDATE`
+#### `ACME_UPGRADE`
 
 Set to `1` in order to automatically update `acme.sh` to the latest version on container startup. This requires an active internet connection (default: `0`).
 

@@ -17,7 +17,8 @@ docker run -it --rm --name haproxy-acme-dns01 \
     -e "ACME_DNS_SLEEP=30" \
     -e "CF_Token=<redacted>" \
     -e "CF_Zone_ID=<redacted>" \
-    -p 80:80 \
-    -p 443:443 \
-    --sysctl net.ipv4.ip_unprivileged_port_start=0 \
+    -e "SERVER_ADDRESS=whoami" \
+    -e "SERVER_PORT=80" \
+    -p 8080:80 \
+    -p 8443:443 \
     flobernd/haproxy-acme-dns01

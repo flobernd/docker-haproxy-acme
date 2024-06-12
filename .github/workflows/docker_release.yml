@@ -99,7 +99,9 @@ jobs:
         env:
           IMAGE_ID: ${{ inputs.image }}
         run: |
-          echo "IMAGE_ID=${IMAGE_ID////_}" >> $GITHUB_ENV
+          echo "IMAGE_ID=${IMAGE_ID////-}" >> $GITHUB_ENV
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Export Digest
         run: |
@@ -108,9 +110,9 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload Digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: digests_${{ env.IMAGE_ID }}
+          name: digests-${{ env.IMAGE_ID }}-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -130,13 +132,14 @@ jobs:
         env:
           IMAGE_ID: ${{ inputs.image }}
         run: |
-          echo "IMAGE_ID=${IMAGE_ID////_}" >> $GITHUB_ENV
+          echo "IMAGE_ID=${IMAGE_ID////-}" >> $GITHUB_ENV
 
       - name: Download Digests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: digests_${{ env.IMAGE_ID }}
           path: /tmp/digests
+          pattern: digests-${{ env.IMAGE_ID }}-*
+          merge-multiple: true
 
       - name: Login to Registry
         uses: docker/login-action@v3

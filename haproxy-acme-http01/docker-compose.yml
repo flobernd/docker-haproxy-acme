@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   haproxy-acme:
     image: flobernd/haproxy-acme-http01:latest
@@ -23,6 +21,8 @@ services:
     ports:
       - 80:80
       - 443:443
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start = 0
 
   whoami:
     image: traefik/whoami

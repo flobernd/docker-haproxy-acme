@@ -24,7 +24,7 @@ if [ "$1" = 'daemon' ]; then
     source /usr/local/share/acme/acme.sh.env
 
     # Upgrade 'acme.sh'
-    if [ $ACME_UPDATE -eq 1 ]; then
+    if [ $ACME_UPGRADE -eq 1 ]; then
         acme.sh --upgrade
         chown -R haproxy:haproxy /var/lib/acme
     fi
