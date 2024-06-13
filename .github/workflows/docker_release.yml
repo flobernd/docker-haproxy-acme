@@ -152,16 +152,30 @@ jobs:
         working-directory: /tmp/digests
         run: |
           readarray -t tags <<<"${{ inputs.tags }}"
-          if [[ -z ${tags[-1]} ]]; then
-              unset 'tags[${#tags[@]}-1]'
-          fi
 
           shopt -s extglob
-          tags=( "${tags[@]/#+([[:blank:]])/}" )
-          tags=( "${tags[@]/%+([[:blank:]])/}" )
-          tags=( "${tags[@]/#/-t }" )
+          tags=( "${tags[@]/#+([[:blank:]])/}" ) # remove leading whitespaces
+          tags=( "${tags[@]/%+([[:blank:]])/}" ) # remove trailing whitespaces
 
-          tags_joined=$(printf " %s" "${tags[@]}")
-          tags_joined=${tags_joined:1}
+          args=(
+              "buildx"
+              "imagetools"
+              "create"
+          )
 
-          eval "docker buildx imagetools create $tags_joined $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)"
+          for t in "${tags[@]}"
+          do
+              if [[ -z "$t" ]]; then
+                  continue
+              fi
+
+              args+=("-t" "$t")
+          done
+
+          for d in *
+          do
+              args+=("${REGISTRY_IMAGE}@sha256:$d")
+          done
+
+          echo "${args[@]}"
+          docker "${args[@]}"
