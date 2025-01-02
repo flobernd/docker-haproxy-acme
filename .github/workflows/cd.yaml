@@ -120,3 +120,27 @@ jobs:
     secrets:
       REGISTRY_USERNAME: ${{ github.actor }}
       REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+  main4:
+    name: CD
+    needs:
+      - meta
+      - main1
+    uses:
+      ./.github/workflows/docker_release.yml
+    with:
+      registry: ghcr.io
+      image: flobernd/haproxy-acme-tlsalpn01
+      context: ./haproxy-acme-tlsalpn01/data
+      build-args: |
+        BASE_IMAGE=ghcr.io/flobernd/haproxy-acme:${{ inputs.version-major }}.${{ inputs.version-minor }}
+      platforms: '["linux/386", "linux/amd64", "linux/arm/v5", "linux/arm/v7", "linux/arm64", "linux/mips64le", "linux/ppc64le", "linux/s390x"]'
+      tags: |
+        ghcr.io/flobernd/haproxy-acme-tlsalpn01:${{ inputs.version-major }}.${{ inputs.version-minor }}
+        ghcr.io/flobernd/haproxy-acme-tlsalpn01:${{ inputs.version-major }}
+        ${{ inputs.tag-latest && format('{0}:latest', 'ghcr.io/flobernd/haproxy-acme-tlsalpn01') || '' }}
+      labels: ${{ needs.meta.outputs.labels }}
+      annotations: ${{ needs.meta.outputs.annotations }}
+    secrets:
+      REGISTRY_USERNAME: ${{ github.actor }}
+      REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
