@@ -322,7 +322,7 @@ docker run -d --name haproxy-acme-tlsalpn01 \
     -e "HAPROXY_HTTPS_PORT=443" \
     -e "HAPROXY_HTTPS_REASSIGN_PORT=8443" \
     -e "ACME_MAIL=mail@domain.com" \
-    -e "ACME_DOMAIN=domain.com *.domain.com" \
+    -e "ACME_DOMAIN=domain.com" \
     -e "ACME_TLSALPN_PORT=10443" \
     -v /docker_data/acme:/var/lib/acme:rw \
     -p 80:80 \
