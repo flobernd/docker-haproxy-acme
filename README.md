@@ -413,7 +413,7 @@ Supported values (depending on the ACME server capabilities): `2048`, `3072`, `4
 
 #### `ACME_TLSALPN_PORT`
 
-The port on which the stateful acme.sh server should run to handle the acme-tls/1 request (default: `10443`).
+The port on which the internal stateful `acme.sh` server should run to handle the `acme-tls/1` request (default: `10443`).
 
 #### `HAPROXY_HTTP_PORT`
 
