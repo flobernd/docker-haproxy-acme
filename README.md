@@ -403,7 +403,7 @@ The mail address for the ACME account registration (*required*).
 
 The domain to issue the certificate for (*required*). To issue a multi-domain certificate (SAN), enter additional domains separated by a space character after the primary domain.
 
-For example: `sub.domain.com` (single), `domain.com *.domain.com` (SAN)
+For example: `sub.domain.com` (single), `domain1.com domain2.com` (SAN)
 
 #### `ACME_KEYLENGTH`
 
