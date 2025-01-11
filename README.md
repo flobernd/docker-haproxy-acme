@@ -425,7 +425,7 @@ The internal `haproxy` HTTPS listening port. Allows changing the internal port t
 
 #### `HAPROXY_HTTPS_REASSIGN_PORT`
 
-The internal `haproxy` port to which the other frontends listening on 443 are reassigned. The frontend listening on 443 instead proxies requests to this frontend or the acme.sh server.
+The internal `haproxy` port to which the other frontends listening on `443` are reassigned (default: `8443`). The frontend listening on `443` instead proxies requests to this frontend or the `acme.sh` server.
 
 #### `SERVER_ADDRESS`
 
