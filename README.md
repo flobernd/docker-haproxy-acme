@@ -312,8 +312,7 @@ The `haproxy-acme-tlsalpn01` image is a ready-to-run image for local SSL termina
 - Automatic certificate renewal
   - HAProxy [Hitless Reload](https://www.haproxy.com/blog/hitless-reloads-with-haproxy-howto) (zero downtime)
   - Configurable certificate renewal notifications (WiP)
-- Support for TLS-ALPN authentication
-    [https://github.com/acmesh-official/acme.sh/wiki/TLS-ALPN-without-downtime]
+- Support for [zero downtime TLS-ALPN authentication](https://github.com/acmesh-official/acme.sh/wiki/TLS-ALPN-without-downtime)
   
 ### Example
 
