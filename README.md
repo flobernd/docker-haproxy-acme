@@ -309,7 +309,6 @@ The `haproxy-acme-tlsalpn01` image is a ready-to-run image for local SSL termina
   - Configurable ACME provider (`Let's Encrypt`, `ZeroSSL`, ...)
   - Configurable key length (`2048`, `4096`, `ec-256`, ...)
   - Supports SAN certificates
-  - Supports wildcard certificates
 - Automatic certificate renewal
   - HAProxy [Hitless Reload](https://www.haproxy.com/blog/hitless-reloads-with-haproxy-howto) (zero downtime)
   - Configurable certificate renewal notifications (WiP)
