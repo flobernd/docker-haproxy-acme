@@ -16,6 +16,7 @@ env:
   REGISTRY_IMAGE_HAPROXY_ACME: localhost:5000/flobernd/haproxy-acme
   REGISTRY_IMAGE_HAPROXY_ACME_HTTP01: localhost:5000/flobernd/haproxy-acme-http01
   REGISTRY_IMAGE_HAPROXY_ACME_DNS01: localhost:5000/flobernd/haproxy-acme-dns01
+  REGISTRY_IMAGE_HAPROXY_ACME_TLSALPN01: localhost:5000/flobernd/haproxy-acme-tlsalpn01
 
 jobs:
   build:
@@ -120,3 +121,31 @@ jobs:
           tags: ${{ steps.meta-haproxy-acme-dns01.outputs.tags }}
           labels: ${{ steps.meta-haproxy-acme-dns01.outputs.labels }}
           annotations: ${{ steps.meta-haproxy-acme-dns01.outputs.annotations }}
+
+      - name: Extract metadata for 'haproxy-acme-tlsalpn01'
+        id: meta-haproxy-acme-tlsalpn01
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_IMAGE_HAPROXY_ACME_TLSALPN01 }}
+          # flavor: |
+          #   latest=false
+          # tags: |
+          #   type=ref,event=branch
+          #   type=ref,event=pr
+          #   type=semver,pattern={{version}}
+          #   type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build 'haproxy-acme-tlsalpn01'
+        id: build-haproxy-acme-tlsalpn01
+        uses: docker/build-push-action@v5
+        with:
+          context: ./haproxy-acme-tlsalpn01/data
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          # platforms: linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x
+          build-args: |
+            BASE_IMAGE=${{ fromJSON(steps.build-haproxy-acme.outputs.metadata)['image.name'] }}
+          tags: ${{ steps.meta-haproxy-acme-tlsalpn01.outputs.tags }}
+          labels: ${{ steps.meta-haproxy-acme-tlsalpn01.outputs.labels }}
+          annotations: ${{ steps.meta-haproxy-acme-tlsalpn01.outputs.annotations }}

@@ -301,6 +301,146 @@ Optional directives for communicating with the internal service. For example `ss
 
 ---
 
+## `haproxy-acme-tlsalpn01`
+
+The `haproxy-acme-tlsalpn01` image is a ready-to-run image for local SSL termination and has the following core features:
+
+- Issues a SSL certificate on startup
+  - Configurable ACME provider (`Let's Encrypt`, `ZeroSSL`, ...)
+  - Configurable key length (`2048`, `4096`, `ec-256`, ...)
+  - Supports SAN certificates
+- Automatic certificate renewal
+  - HAProxy [Hitless Reload](https://www.haproxy.com/blog/hitless-reloads-with-haproxy-howto) (zero downtime)
+  - Configurable certificate renewal notifications (WiP)
+- Support for [zero downtime TLS-ALPN authentication](https://github.com/acmesh-official/acme.sh/wiki/TLS-ALPN-without-downtime)
+  
+### Example
+
+```bash
+docker run -d --name haproxy-acme-tlsalpn01 \
+    -e "HAPROXY_HTTP_PORT=80" \
+    -e "HAPROXY_HTTPS_PORT=443" \
+    -e "HAPROXY_HTTPS_REASSIGN_PORT=8443" \
+    -e "ACME_MAIL=mail@domain.com" \
+    -e "ACME_DOMAIN=domain.com" \
+    -e "ACME_TLSALPN_PORT=10443" \
+    -v /docker_data/acme:/var/lib/acme:rw \
+    -p 80:80 \
+    -p 443:443 \
+    ghcr.io/flobernd/haproxy-acme-tlsalpn01
+```
+
+### Docker Compose Example
+
+```yaml
+services:
+  haproxy-acme:
+    image: ghcr.io/flobernd/haproxy-acme-tlsalpn01:latest
+    container_name: haproxy-acme-tlsalpn01
+    restart: unless-stopped
+    environment:
+      - "HAPROXY_HTTP_PORT=80"
+      - "HAPROXY_HTTPS_PORT=443"
+      - "HAPROXY_HTTPS_REASSIGN_PORT=8443"
+      - "ACME_MAIL=mail@domain.com"
+      - "ACME_DOMAIN=domain.com"
+      - "ACME_TLSALPN_PORT=10443"
+    volumes:
+      - /docker_data/acme:/var/lib/acme:rw
+    ports:
+      - 80:80
+      - 443:443
+```
+
+### Persistence
+
+It is strongly recommended to specify an external volume for the `/var/lib/acme` directory. Most ACME servers enforce a rate limit for issuing and renewing certificates. If you recreate the container without preserving the internal state of `acme.sh`, a new certificate will also be created each time.
+
+### HAProxy Configuration
+
+The container creates a default configuration file `haproxy.cfg` in the `/usr/local/etc/haproxy` directory.
+
+By mapping the aforementioned path, the primary `haproxy.cfg` can be freely customized. Alternatively, additional configurations can be placed in the `include` directory, which are then loaded after the primary configuration in alphabetical order.
+
+As long as the default config has not been modified or overwritten, the `SERVER_ADDRESS` (*required*), `SERVER_PORT` (default `80`), `HAPROXY_HTTP_PORT` (default `80`), `HAPROXY_HTTPS_PORT` (default `443`), `HAPROXY_HTTPS_REASSIGN_PORT` (default `8443`) environment variables must be set. Otherwise the container will fail to start.
+
+> [!IMPORTANT]
+> When overwriting the default configuration, make sure that the `stats socket` directive is retained. Otherwise, the deployment of certificates will fail.
+
+```
+global
+  # Allow 'acme.sh' to deploy new certificates without reloading
+  stats socket /var/lib/haproxy/admin.sock level admin mode 660
+```
+
+### Environment
+
+#### `ACME_DEBUG`
+
+Set to `1` in order to enable verbose `acme.sh` debug output.
+
+#### `ACME_UPGRADE`
+
+Set to `1` in order to automatically update `acme.sh` to the latest version on container startup. This requires an active internet connection (default: `0`).
+
+#### `ACME_CRON`
+
+Set to `1` in order to enable the certificate renewal cronjob (default: `1`).
+
+#### `ACME_SERVER`
+
+The ACME server to use (default: `letsencrypt`).
+
+Supported values: `letsencrypt`, `letsencrypt_test`, `buypass`, `buypass_test`, `zerossl`, `sslcom`, `google`, `googletest` or an explicit ACME server directory URL like e.g. `https://acme-v02.api.letsencrypt.org/directory`
+
+See also: https://github.com/acmesh-official/acme.sh/wiki/Server
+
+#### `ACME_MAIL`
+
+The mail address for the ACME account registration (*required*).
+
+#### `ACME_DOMAIN`
+
+The domain to issue the certificate for (*required*). To issue a multi-domain certificate (SAN), enter additional domains separated by a space character after the primary domain.
+
+For example: `sub.domain.com` (single), `domain1.com domain2.com` (SAN)
+
+#### `ACME_KEYLENGTH`
+
+The desired domain key length (default: `ec-256`).
+
+Supported values (depending on the ACME server capabilities): `2048`, `3072`, `4096`, `8192`, `ec-256`, `ec-384`, `ec-521`.
+
+#### `ACME_TLSALPN_PORT`
+
+The port on which the internal stateful `acme.sh` server should run to handle the `acme-tls/1` request (default: `10443`).
+
+#### `HAPROXY_HTTP_PORT`
+
+The internal `haproxy` HTTP listening port. Allows changing the internal port to a non-privileged one (default: `80`). Do not forget to adjust the Docker port mapping accordingly (e.g. `-p 80:8080`).
+
+#### `HAPROXY_HTTPS_PORT`
+
+The internal `haproxy` HTTPS listening port. Allows changing the internal port to a non-privileged one (default: `443`). Do not forget to adjust the Docker port mapping accordingly (e.g. `-p 443:8443`).
+
+#### `HAPROXY_HTTPS_REASSIGN_PORT`
+
+The internal `haproxy` port to which the other frontends listening on `443` are reassigned (default: `8443`). The frontend listening on `443` instead proxies requests to this frontend or the `acme.sh` server.
+
+#### `SERVER_ADDRESS`
+
+The hostname or IP-address of the internal service for which SSL terminiation should be provided (*required*).
+
+#### `SERVER_PORT`
+
+The port of the internal service for which SSL terminiation should be provided (default: `80`).
+
+#### `SERVER_DIRECTIVES`
+
+Optional directives for communicating with the internal service. For example `ssl` must be specified here, if the internal service uses HTTPS. Check the `haproxy` documentation for more directives.
+
+---
+
 ## `haproxy-acme`
 
 The base image `haproxy-acme` is based on the [Docker "Official Image"](https://github.com/docker-library/haproxy) for [haproxy](https://www.haproxy.org/) and the [acme.sh](https://github.com/acmesh-official/acme.sh) Bash script. It serves as a generic template, providing some hook points for customization:
