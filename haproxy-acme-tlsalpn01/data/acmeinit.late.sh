@@ -46,7 +46,11 @@ export DEPLOY_HAPROXY_PEM_PATH=/etc/haproxy/certs
 args=(
     "--deploy"
     "--deploy-hook" "haproxy"
-    "-d" "${domains[0]}"
 )
+
+for d in "${domains[@]}"
+do
+    args+=("-d" "$d")
+done
 
 acme.sh "${args[@]}"

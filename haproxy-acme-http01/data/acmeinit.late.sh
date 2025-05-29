@@ -24,10 +24,6 @@ args=(
     "-d" "${domains[0]}"
 )
 
-if [ -n "$ACME_DNS_SLEEP" ]; then
-    args+=("--dnssleep" "$ACME_DNS_SLEEP")
-fi
-
 for d in "${domains[@]:1}"
 do
     args+=("-d" "$d")
@@ -55,7 +51,11 @@ export DEPLOY_HAPROXY_PEM_PATH=/etc/haproxy/certs
 args=(
     "--deploy"
     "--deploy-hook" "haproxy"
-    "-d" "${domains[0]}"
 )
+
+for d in "${domains[@]}"
+do
+    args+=("-d" "$d")
+done
 
 acme.sh "${args[@]}"
